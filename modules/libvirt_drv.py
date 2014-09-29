@@ -14,8 +14,8 @@ class Connect():
         conn = self.__connect()
         main_xml = conn.getCapabilities()
         self.__root = ET.fromstring(main_xml)
-        uuid = self.__root.find('./host/').text()
-        return uuid, self
+        self.uuid = self.__root.find('./host/').text
+
 
     def __connect(self):
         return self.__lv.open("qemu+ssh://%s@%s/system" % (self.__login, self.__host))

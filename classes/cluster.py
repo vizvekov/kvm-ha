@@ -14,7 +14,7 @@ class Cluster():
 
     def add_node(self, auth={}):
         try:
-            uuid, load_driver = import_module(self.__mod_path,
+            load_driver = import_module(self.__mod_path,
                                         self.__driver,
                                        'Connect').Connect(host=auth['host'],
                                                                login=auth['login'],
@@ -22,7 +22,8 @@ class Cluster():
         except Exception, error:
             print(error)
             return False
-        self.__nodes.update({uuid: load_driver})
+        self.__nodes.update({load_driver.uuid: load_driver})
+        self.__update_nodes_status()
         return True
 
     def live_migrate_instance(self, instance_id):
@@ -47,6 +48,9 @@ class Cluster():
                                          'desc': instance['desc']})
             self.__timer = threading.Timer(60, self.__update_nodes_status())
             self.__timer.start()
+
+    def get_instances(self):
+        return self.__instances
 
     def __restart_on_other_node(self, node_id, instance_id):
         pass
