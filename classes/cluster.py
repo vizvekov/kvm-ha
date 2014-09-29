@@ -34,18 +34,23 @@ class Cluster():
         pass
 
     def __update_nodes_status(self):
+        print "Start update"
         for node_uuid, driver in self.__nodes.iteritems():
             raw_list = driver.get_instancs()
-            for instance in raw_list:
-                try:
-                    old_instance = get_index(self.__instances, 'uuid', instance['uuid'])
-                    disc = driver.get_instance_desc(instance['uuid'])
-                    if get_hash(disc) != old_instance['desc_hash']:
-                        old_instance['desc_hash'] = get_hash(disc)
-                        old_instance['desc'] = disc
-                except Exception, error:
-                    print error
-                    self.__instances.append({'uuid': instance['uuid'],
+            if not raw_list:
+                print "libvirt connect error (uuid: %s)" % node_uuid
+            else:
+                for instance in raw_list:
+                    try:
+                        old_instance = get_index(self.__instances, 'uuid', instance['uuid'])
+                        disc = driver.get_instance_desc(instance['uuid'])
+                        if get_hash(disc) != old_instance['desc_hash']:
+                            print "Updating xml for instance %s" % instance['uuid']
+                            old_instance['desc_hash'] = get_hash(disc)
+                            old_instance['desc'] = disc
+                    except Exception, error:
+                        print error
+                        self.__instances.append({'uuid': instance['uuid'],
                                          'status': instance['status'],
                                          'on_node': node_uuid,
                                          'desc_hash': instance['desc_hash'],

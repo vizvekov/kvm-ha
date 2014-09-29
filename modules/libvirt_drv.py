@@ -17,12 +17,24 @@ class Connect():
         self.uuid = self.__root.find('./host/').text
 
     def __connect(self):
+        try:
+            if self.__conn.isAlive():
+                return True
+        except Exception, error:
+            print error
         self.__conn = self.__lv.open("qemu+ssh://%s@%s/system" % (self.__login, self.__host))
+        if self.__conn == None:
+            return False
+        return True
 
     def get_instance_desc(self, uuid, desc_hash=False):
+        if not self.__connect():
+            return False
         return self.__conn.lookupByUUIDString(uuid).XMLDesc()
 
     def get_instancs(self, run_only=True):
+        if not self.__connect():
+            return False
         instance = []
         for instance_id in self.__conn.listDomainsID():
             dom = self.__conn.lookupByID(instance_id)
