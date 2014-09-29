@@ -26,6 +26,10 @@ class Cluster():
         self.__update_nodes_status()
         return True
 
+    def start_cron(self):
+        self.__timer = threading.Timer(60, self.__update_nodes_status())
+        self.__timer.start()
+
     def live_migrate_instance(self, instance_id):
         pass
 
@@ -46,8 +50,6 @@ class Cluster():
                                          'on_node': node_uuid,
                                          'desc_hash': instance['desc_hash'],
                                          'desc': instance['desc']})
-            self.__timer = threading.Timer(60, self.__update_nodes_status())
-            self.__timer.start()
 
     def get_instances(self):
         return self.__instances
